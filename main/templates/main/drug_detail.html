@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Details</title>
+	{% load static %}
+	<link href="https://fonts.googleapis.com/css?family=Hind:400,700" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css?family=Rubik:400,700|Crimson+Text:400,400i" rel="stylesheet">
+
+	<link rel="stylesheet" href="{% static 'fonts/icomoon/style.css' %}">
+
+	<link rel="stylesheet" href="{% static 'css/bootstrap.min.css' %}">
+	<link rel="stylesheet" href="{% static 'css/magnific-popup.css' %}">
+	<link rel="stylesheet" href="{% static 'css/jquery-ui.css' %}">
+	<link rel="stylesheet" href="{% static 'css/owl.carousel.min.css' %}">
+	<link rel="stylesheet" href="{% static 'css/owl.theme.default.min.css' %}">
+
+	<link rel="stylesheet" href="{% static 'css/aos.css' %}">
+	<link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+	<link type="text/css" rel="stylesheet" href="{% static 'css2/bootstrap.min.css' %}" />
+	<link type="text/css" rel="stylesheet" href="{% static 'css2/slick.css' %}" />
+	<link type="text/css" rel="stylesheet" href="{% static 'css2/slick-theme.css' %}" />
+
+	<link type="text/css" rel="stylesheet" href="{% static 'css2/nouislider.min.css' %}" />
+	<link rel="stylesheet" href="{% static 'css2/font-awesome.min.css' %}">
+	<link type="text/css" rel="stylesheet" href="{% static 'css2/style.css' %}" />
+
+	<script src="https://oss.maxcdn.com/html5shiv/3.7.3/html5shiv.min.js"></script>
+	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+
+</head>
+<body>
+	<div class="site-wrap">
+
+
+		<div class="site-navbar py-2">
+
+			<div class="search-wrap">
+				<div class="container">
+					<a href="#" class="search-close js-search-close"><span class="icon-close2"></span></a>
+					<form action="{% url 'drugs-list' %}" method="get" >
+						<input name='q' type="text" class="form-control" placeholder="Search keyword and hit enter...">
+					</form>
+				</div>
+			</div>
+
+			<div class="container">
+				<div class="d-flex align-items-center justify-content-between">
+					<div class="logo">
+						<div class="site-logo">
+							<a href="{% url 'catalog' %}" class="js-logo-clone">Pyteka</a>
+						</div>
+					</div>
+					<div class="main-nav d-none d-lg-block">
+						<nav class="site-navigation text-right text-md-center" role="navigation">
+							<ul class="site-menu js-clone-nav d-none d-lg-block">
+								<li class="active"><a href="{% url 'catalog' %}">Home</a></li>
+								<li><a href="about.html">About</a></li>
+								{% if request.user.is_authenticated %}
+									<li><a href="{% url 'logout' %}">Log out</a></li>
+								{% else %}
+									<li><a href="{% url 'login' %}">Log in</a></li>
+									<li><a href="{% url 'signup' %}">Sign up</a></li>
+								{% endif %}
+							</ul>
+						</nav>
+					</div>
+					<div class="icons">
+						<a href="#" class="icons-btn d-inline-block js-search-open"><span class="icon-search"></span></a>
+						<a href="{% url 'cart:cart-detail' %}" class="icons-btn d-inline-block bag">
+							<span class="icon-shopping-bag"></span>
+							<span class="number">{{ cart.total_items }}</span>
+						</a>
+						<a href="#" class="site-menu-toggle js-menu-toggle ml-3 d-inline-block d-lg-none"><span
+								class="icon-menu"></span></a>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<div class="bg-light py-3">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-12 mb-0"><a href="index.html">Home</a> <span class="mx-2 mb-0">/</span> <a
+              href="shop.html">Store</a> <span class="mx-2 mb-0">/</span> <strong class="text-black">{{ drug.title}}</strong></div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="site-section">
+      <div class="container">
+        <div class="row">
+          <div class="col-md-5 mr-auto">
+            <div class="border text-center">
+              <img src="{{ drug.image.url}}" alt="Image" class="img-fluid p-5">
+            </div>
+          </div>
+          <div class="col-md-6">
+            <h2 class="text-black">{{ drug.title}}</h2>
+            <p>{{ drug.description|safe }}</p>
+
+			<h3>${{ drug.price }}</h3>
+
+            <div class="mb-5">
+	            <form action="{% url "cart:cart-add" drug.id %}" method="post">
+		            {{ cart_drug_form }}
+		            {% csrf_token %}
+		            {% if request.user.is_authenticated %}
+		                <button class="primary-btn add-to-cart" type="submit">Add to Cart</button>
+		            {% else %}
+		                <a href="{% url 'login' %}" class="primary-btn">Add to Cart</a>
+		            {% endif %}
+                </form>
+            </div>
+
+
+              </div>
+            </div>
+
+	      <div class="col-md-12">
+		      <div class="product-tab">
+			      <ul class="tab-nav">
+				      <li><a data-toggle="tab" href="#tab1">Ingridients</a></li>
+				      <li><a data-toggle="tab" href="#tab2">Reviews ({{ comments.count }})</a></li>
+			      </ul>
+			      <div class="tab-content">
+				      <div id="tab1" class="tab-pane fade in active">
+					      <p>{{ drug.ingridients|safe }}</p>
+				      </div>
+				      <div id="tab2" class="tab-pane fade in">
+
+					      <div class="row">
+						      <div class="col-md-6">
+							      <div class="product-reviews">
+								      {% for comment in comments %}
+								      <div class="single-review">
+									      <div class="review-heading">
+										      <div><a href="#"><i class="fa fa-user-o"></i> {{ comment.user.username }}</a></div>
+										      <div><b><i class="fa fa-user-o"></i><a href="#"> {{ comment.subject }}</a></b></div>
+										      <div><a href="#"><i class="fa fa-clock-o"></i>{{ comment.create_at }}</a></div>
+
+										      <div class="review-rating pull-right">
+											      <i class="fa fa-star{% if comment.rate < 1 %}-o empty{% endif %}"></i>
+											      <i class="fa fa-star{% if comment.rate < 2 %}-o empty{% endif %}"></i>
+											      <i class="fa fa-star{% if comment.rate < 3 %}-o empty{% endif %}"></i>
+											      <i class="fa fa-star{% if comment.rate < 4 %}-o empty{% endif %}"></i>
+											      <i class="fa fa-star{% if comment.rate < 5 %}-o empty{% endif %}"></i>
+										      </div>
+
+									      </div>
+									      <div class="review-body">
+										      <p>{{ comment.comment }}</p>
+									      </div>
+								      </div>
+								      {% endfor %}
+
+							      </div>
+						      </div>
+						      <div class="col-md-6">
+							      <h4 class="text-uppercase">Write Your Review</h4>
+
+							      <form class="review-form" action="{% url 'add-comment' drug.id %}" method="post">
+								      {% csrf_token %}
+								      {% if messages %}
+									      {% for message in messages %}
+										      <div class="alert alert-{{ message.tags }}" role="alert">
+											      {{ message }}
+										      </div>
+									      {% endfor %}
+								      {% endif %}
+								      <div class="form-group">
+									      <input name="subject" class="input" type="text" placeholder="Your subject" />
+								      </div>
+								      <div class="form-group">
+									      <textarea name="comment" class="input" placeholder="Your review"></textarea>
+								      </div>
+								      <div class="form-group">
+									      <div class="input-rating">
+										      <strong class="text-uppercase">Your Rating: </strong>
+										      <div class="stars">
+											      <input type="radio" id="star5" name="rate" value="5" /><label for="star5"></label>
+											      <input type="radio" id="star4" name="rate" value="4" /><label for="star4"></label>
+											      <input type="radio" id="star3" name="rate" value="3" /><label for="star3"></label>
+											      <input type="radio" id="star2" name="rate" value="2" /><label for="star2"></label>
+											      <input type="radio" id="star1" name="rate" value="1" /><label for="star1"></label>
+										      </div>
+									      </div>
+								      </div>
+								      {% if request.user.is_authenticated %}
+								        <button class="primary-btn">Submit</button>
+								      {% else %}
+									      <a href="{% url 'login' %}" class="primary-btn">Submit</a>
+								      {% endif %}
+							      </form>
+						      </div>
+					      </div>
+
+
+
+				      </div>
+			      </div>
+		      </div>
+	      </div>
+
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+		<footer class="site-footer">
+			<div class="container">
+				<div class="row">
+					<div class="col-md-6 col-lg-3 mb-4 mb-lg-0">
+
+						<div class="block-7">
+							<h3 class="footer-heading mb-4">About Us</h3>
+							<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Eius quae reiciendis distinctio voluptates
+								sed dolorum excepturi iure eaque, aut unde.</p>
+						</div>
+
+					</div>
+					<div class="col-lg-3 mx-auto mb-5 mb-lg-0">
+						<h3 class="footer-heading mb-4">Quick Links</h3>
+						<ul class="list-unstyled">
+							<li><a href="#">Supplements</a></li>
+							<li><a href="#">Vitamins</a></li>
+							<li><a href="#">Diet &amp; Nutrition</a></li>
+							<li><a href="#">Tea &amp; Coffee</a></li>
+						</ul>
+					</div>
+
+					<div class="col-md-6 col-lg-3">
+						<div class="block-5 mb-5">
+							<h3 class="footer-heading mb-4">Contact Info</h3>
+							<ul class="list-unstyled">
+								<li class="address">203 Fake St. Mountain View, San Francisco, California, USA</li>
+								<li class="phone"><a href="tel://23923929210">+2 392 3929 210</a></li>
+								<li class="email">emailaddress@domain.com</li>
+							</ul>
+						</div>
+
+
+					</div>
+				</div>
+				<div class="row pt-5 mt-5 text-center">
+					<div class="col-md-12">
+						<p>
+							<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+							Copyright &copy;
+							<script>document.write(new Date().getFullYear());</script> All rights reserved | This template is made
+							with <i class="icon-heart" aria-hidden="true"></i> by <a href="https://colorlib.com" target="_blank"
+							                                                         class="text-primary">Colorlib</a>
+							<!-- Link back to Colorlib can't be removed. Template is licensed under CC BY 3.0. -->
+						</p>
+					</div>
+
+				</div>
+			</div>
+		</footer>
+	</div>
+
+
+	<script src="{% static 'js/jquery-3.3.1.min.js' %}"></script>
+	<script src="{% static 'js/jquery-ui.js' %}"></script>
+	<script src="{% static 'js/popper.min.js' %}"></script>
+	<script src="{% static 'js/bootstrap.min.js' %}"></script>
+	<script src="{% static 'js/owl.carousel.min.js' %}"></script>
+	<script src="{% static 'js/jquery.magnific-popup.min.js' %}"></script>
+	<script src="{% static 'js/aos.js' %}"></script>
+
+	<script src="{% static 'js/main.js' %}"></script>
+
+
+	<script src="{% static 'js2/jquery.min.js' %}"></script>
+	<script src="{% static 'js2/bootstrap.min.js' %}"></script>
+	<script src="{% static 'js2/slick.min.js' %}"></script>
+	<script src="{% static 'js2/nouislider.min.js' %}"></script>
+	<script src="{% static 'js2/jquery.zoom.min.js' %}"></script>
+	<script src="{% static 'js2/main.js' %}"></script>
+
+
+</body>
+</html>

@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% block title %}
+	Payment
+{% endblock %}
+{% block content %}
+	<div class="bg-light py-3">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-12 mb-0">
+					<a href="index.html">Home</a> <span class="mx-2 mb-0">/</span>
+					<strong class="text-black">Checkout</strong>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="site-section">
+		<div class="container">
+			<div class="row">
+				<div class="col-md-6 mb-5 mb-md-0">
+					<h1 class="h3 mb-3 text-black">Pay by credit card</h1>
+					<form action="." id="payment" method="post">
+						<label class="h5 mb-3 text-black" for="card-number">Card Number</label>
+						<div id="card-number" class="field" style="background-color: lightgrey; width: 50%; height: 40px; padding: 12px 20px; margin: 8px 0; box-sizing: border-box; border: none; border-radius: 4px;"></div>
+						<label class="h5 mb-3 text-black" for="cvv">CVV</label>
+						<div id="cvv" class="field" style="background-color: lightgrey; width: 50%; height: 40px; padding: 12px 20px; margin: 8px 0; box-sizing: border-box; border: none; border-radius: 4px;"></div>
+						<label class="h5 mb-3 text-black" for="expiration-date">Expiration Date</label>
+						<div id="expiration-date" class="field" style="background-color: lightgrey; width: 50%; height: 40px; padding: 12px 20px; margin: 8px 0; box-sizing: border-box; border: none; border-radius: 4px;"></div>
+						<input type="hidden" id="nonce" name="payment_method_nonce" value="">
+						{% csrf_token %}
+						<input class="btn btn-primary btn-lg" type="submit" value="Pay">
+					</form>
+					<!—Подключаем клиента Braintree. -->
+					<script src="https://js.braintreegateway.com/web/3.65.0/js/client.min.js"></script>
+					<!—Подключаем компонент Hosted Fields. -->
+					<script src="https://js.braintreegateway.com/web/3.65.0/js/hosted-fields.min.js"></script>
+					<script>
+
+                        var form = document.querySelector('#payment');
+                        var submit = document.querySelector('input[type="submit"]');
+                        braintree.client.create({
+                            authorization: '{{ client_token }}'
+                        }, function (clientErr, clientInstance) {
+                            if (clientErr) {
+                                console.error(clientErr);
+                                return;
+                            }
+                            braintree.hostedFields.create({
+                                client: clientInstance,
+                                styles: {
+                                    'input': {'font-size': '13px'},
+                                    'input.invalid': {'color': 'red'},
+	                                'input.valid': {'color': 'green'}
+                        },
+                            fields: {
+                                number: {selector: '#card-number'},
+                                cvv: {selector: '#cvv'},
+                                expirationDate: {selector: '#expiration-date'}
+                            }
+                        }, function (hostedFieldsErr, hostedFieldsInstance) {
+                                if (hostedFieldsErr) {
+                                    console.error(hostedFieldsErr);
+                                    return;
+                                }
+                                submit.removeAttribute('disabled');
+                                form.addEventListener('submit', function (event) {
+                                    event.preventDefault();
+                                    hostedFieldsInstance.tokenize(function (tokenizeErr, payload) {
+                                        if (tokenizeErr) {
+                                            console.error(tokenizeErr);
+                                            return;
+                                        }
+                                        document.getElementById('nonce').value = payload.nonce;
+                                        document.getElementById('payment').submit();
+                                    });
+                                }, false);
+                            });
+                        });
+					</script>
+
+				</div>
+			</div>
+		</div>
+
+	</div>
+{% endblock %}

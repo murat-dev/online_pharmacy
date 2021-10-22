@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}
+	Order History
+{% endblock %}
+
+{% block content %}
+		<div class="site-section">
+	      <div class="container">
+	        <div class="row mb-5">
+	          <form class="col-md-12" method="post">
+	            <div class="site-blocks-table">
+	              <table class="table table-bordered">
+	                <thead>
+	                  <tr>
+	                    <th class="product-name">Order no.</th>
+	                    <th class="product-quantity">Created</th>
+		                  <th class="product-price">Price</th>
+	                  </tr>
+	                </thead>
+	                <tbody>
+	                 {% for order in orders %}
+	                  <tr>
+		                  <td class="product-name">
+			                  <a href="{% url 'orders:order-history' order.id %}"><h2 class="h5 text-black">{{ order.id }}</h2></a>
+		                  </td>
+		                  <td>{{ order.created }}</td>
+	                      <td class="num">${{ order.get_total_cost }}</td>
+	                  </tr>
+	                 {% endfor %}
+
+	                </tbody>
+	              </table>
+	            </div>
+	          </form>
+	        </div>
+{% endblock %}
